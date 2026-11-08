@@ -10,7 +10,7 @@ function! roumail_place#get(...) abort
 endfunction
 
 " Where a plugin keeps its files, named name: in the git dir of the
-" repository, else in g:roumail_place_dir, else in the XDG state directory,
+" repository, else in the XDG state directory,
 " so every plugin keeps its files the same way. The directory is created.
 " opts:
 "   bufnr     whose repository (default: the current buffer's, else the
@@ -36,10 +36,6 @@ endfunction
 
 " Where files go outside a repository
 function! s:outside() abort
-  let l:dir = get(g:, 'roumail_place_dir', '')
-  if !empty(l:dir)
-    return expand(l:dir)
-  endif
   return empty($XDG_STATE_HOME) ? expand('~/.local/state') : $XDG_STATE_HOME
 endfunction
 
