@@ -2,9 +2,9 @@
 
 A convention for where Vim plugins keep their files. Instead of each plugin
 finding the git dir and choosing a path, every plugin asks vim-place and
-gets the same answer: inside the repository's git dir, so the files are
-never committed and outlive a work tree, or a per-directory state folder
-outside a repository.
+gets the same answer: inside the repository's git dir, outside the work
+tree, so the files stay out of commits and outlive a work tree, or a
+per-directory state folder outside a repository.
 
 The files are state, not cache: saved comments, saved lists, prompts an
 agent still reads. They stay until the plugin that wrote them deletes them.
@@ -29,10 +29,8 @@ missing, the first of:
 1. `<git dir>/<name>` when the buffer, or else the current directory, is in a
    git repository (found by vim-fugitive): the git dir shared by all work
    trees, so the files outlive a work tree.
-2. `<g:roumail_place_dir>/<place>/<name>` outside a repository, when it is
-   set.
-3. `<$XDG_STATE_HOME>/<place>/<name>` (`~/.local/state/<place>/<name>`)
-   otherwise.
+2. `<$XDG_STATE_HOME>/<place>/<name>` (`~/.local/state/<place>/<name>`)
+   outside a repository.
 
 Outside a repository, `<place>` keeps each directory's files apart, as a
 repository's git dir does: the current directory's name and a short hash of
@@ -51,26 +49,18 @@ with `repo` 1, else the current directory, with `repo` 0. Paths a plugin
 shows or saves are relative to `dir`, so they read the same in every work
 tree.
 
-## Settings
-
-| Variable | Default |
-| --- | --- |
-| `g:roumail_place_dir` | Unset: what plugins keep outside a repository goes in the XDG state directory (`$XDG_STATE_HOME`, else `~/.local/state`). |
-
 ## Install
 
 Requires [vim-fugitive](https://github.com/tpope/vim-fugitive), which finds
-the git directory. It has no commands; plugins call it.
+the git directory. Plugins call it; it has nothing to type.
 
 ```vim
 Plug 'tpope/vim-fugitive'
-Plug 'roumail/vim-place'
+Plug 'vimoured/vim-place'
 ```
 
 ## Tests
 
-```sh
-vim -Nu NONE -i NONE -Es -S test/run.vim
-```
-
-vim-fugitive comes from `$FUGITIVE`, else vim-plug's copy.
+Tested by [vim-suite](https://github.com/vimoured/vim-suite), in
+`test/vim-place.vim`, and through the plugins that keep files with it. Every
+pull request runs them.
