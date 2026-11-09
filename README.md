@@ -1,8 +1,14 @@
 # vim-place
 
-Where Vim plugins keep their files: inside the repository's git directory, so
-they stay out of commits and outlive a work tree, or in a per-directory state
-folder outside a repository. Plugins call it; it has nothing to type.
+A library that gives Vim plugins a place to keep their files. It has no commands
+or mappings of its own, so you only need it when another plugin requires it.
+
+Each plugin gets a directory:
+
+- **In a git repository:** inside the git directory, so the files stay out of
+  commits and are still there after a work tree is removed.
+- **Outside a repository:** in a state folder for that directory, under
+  `$XDG_STATE_HOME` (default `~/.local/state`).
 
 **Vim or Neovim:** tested on Vim 9.1 and newer. It's plain Vimscript, so it may
 work on Neovim, but that's untested.
@@ -16,20 +22,44 @@ Plug 'tpope/vim-fugitive'
 Plug 'vimoured/vim-place'
 ```
 
-## Functions
+## Use
 
-| Function | What it does |
+### `roumail_place#dir(name [, opts])`
+
+Returns the directory for `name`, creating it if it's missing:
+
+```vim
+let l:dir = roumail_place#dir('my-plugin')
+call writefile(l:lines, l:dir . '/notes.txt')
+```
+
+Use your plugin's name. Call it each time rather than storing the path, because
+the answer depends on the buffer you're in.
+
+| Where | Directory |
 | --- | --- |
-| `roumail_place#dir(name [, opts])` | The directory for `name`, created if missing: `<git dir>/<name>`, else `<$XDG_STATE_HOME>/<place>/<name>`. |
-| `roumail_place#get([bufnr])` | Where a plugin is working, as `{dir, repo}`: the work tree with `repo` 1, else the current directory with `repo` 0. |
+| In a repository | `<git dir>/<name>`, shared by all its work trees |
+| In a repository, with `worktree` set | `<the work tree's git dir>/<name>`, removed with the work tree |
+| Outside a repository | `<$XDG_STATE_HOME>/<directory name>-<hash>/<name>` |
 
-Name the directory after your plugin, and call `dir()` each time rather than
-storing the path.
+`opts` is a dictionary:
 
-| Option | Default |
-| --- | --- |
-| `bufnr` | The current buffer: whose repository it is. |
-| `worktree` | `0`. `1` uses the work tree's own git dir, which git removes with the work tree. |
+| Option | Default | What it does |
+| --- | --- | --- |
+| `bufnr` | The current buffer | Use this buffer's repository. |
+| `worktree` | `0` | `1` keeps the files with the work tree, for files of no use after it's gone. |
+
+### `roumail_place#get([bufnr])`
+
+Returns where a plugin is working, for the current buffer or `bufnr`:
+
+| Key | In a repository | Outside a repository |
+| --- | --- | --- |
+| `dir` | The work tree | The current directory |
+| `repo` | `1` | `0` |
+
+A buffer that isn't in a repository uses the current directory's repository, for
+both functions.
 
 ## Tests
 
